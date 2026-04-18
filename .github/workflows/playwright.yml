@@ -37,7 +37,7 @@ jobs:
         if: always()
         run: |
           RESULTS=$(cat results/playwright-results.json 2>/dev/null || echo '{}')
-          curl -X POST "${{ secrets.N8N_WEBHOOK_URL }}" \
+          curl -X POST "${{ secrets.N8N_PLAYWRIGHT_RESULTS_URL }}" \
             -H "Content-Type: application/json" \
             -d "{
               \"runId\": \"${{ github.event.inputs.run_id }}\",
