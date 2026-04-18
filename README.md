@@ -1,5 +1,5 @@
 # QA Automation – n8n Pipeline
-
+x
 Playwright + Newman tests wired to n8n for orchestration, Slack alerts, and Jira ticket creation.
 
 ## Project structure
