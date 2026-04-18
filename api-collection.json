@@ -1,0 +1,126 @@
+{
+  "info": {
+    "name": "QA API Tests",
+    "_postman_id": "qa-api-collection-v1",
+    "description": "Basic API health and smoke tests. Uses jsonplaceholder.typicode.com (free public API) so tests run immediately without any setup.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health – API is reachable",
+      "request": {
+        "method": "GET",
+        "url": "https://jsonplaceholder.typicode.com/posts/1",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Response time < 2000ms', function () {",
+              "  pm.expect(pm.response.responseTime).to.be.below(2000);",
+              "});",
+              "pm.test('Response is JSON', function () {",
+              "  pm.response.to.be.json;",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET – Fetch all posts",
+      "request": {
+        "method": "GET",
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Returns an array', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.be.an('array');",
+              "});",
+              "pm.test('Array is not empty', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json.length).to.be.greaterThan(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST – Create a post",
+      "request": {
+        "method": "POST",
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"QA Test Post\",\n  \"body\": \"Automated test from n8n pipeline\",\n  \"userId\": 1\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "pm.test('Response has an id', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('id');",
+              "});",
+              "pm.test('Title matches what we sent', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json.title).to.eql('QA Test Post');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET – Fetch single user",
+      "request": {
+        "method": "GET",
+        "url": "https://jsonplaceholder.typicode.com/users/1",
+        "header": []
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('User has email field', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('email');",
+              "});",
+              "pm.test('User has name field', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('name');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
