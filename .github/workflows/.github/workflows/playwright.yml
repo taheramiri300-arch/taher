@@ -1,0 +1,38 @@
+name: Playwright Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: false
+        default: staging
+      base_url:
+        required: false
+        default: https://example.com
+      run_id:
+        required: false
+        default: manual-test
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install chromium --with-deps
+      - run: mkdir -p results
+      - run: npx playwright test
+        env:
+          BASE_URL: ${{ github.event.inputs.base_url }}
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-results-${{ github.event.inputs.run_id }}
+          path: results/playwright-results.json
+          retention-days: 7
