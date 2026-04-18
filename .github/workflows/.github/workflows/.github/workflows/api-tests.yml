@@ -1,0 +1,32 @@
+name: API Tests (Newman)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: false
+        default: staging
+      run_id:
+        required: false
+        default: manual-test
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: mkdir -p results
+      - run: npx newman run tests/api-collection.json --reporters json,cli --reporter-json-export results/api-results.json
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-results-${{ github.event.inputs.run_id }}
+          path: results/api-results.json
+          retention-days: 7
