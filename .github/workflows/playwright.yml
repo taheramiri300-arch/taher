@@ -33,3 +33,18 @@ jobs:
           name: playwright-results-${{ github.event.inputs.run_id }}
           path: results/playwright-results.json
           retention-days: 7
+      - name: Send results to n8n
+        if: always()
+        run: |
+          RESULTS=$(cat results/playwright-results.json 2>/dev/null || echo '{}')
+          curl -X POST "${{ secrets.N8N_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"runId\": \"${{ github.event.inputs.run_id }}\",
+              \"environment\": \"${{ github.event.inputs.environment }}\",
+              \"base_url\": \"${{ github.event.inputs.base_url }}\",
+              \"status\": \"${{ job.status }}\",
+              \"branch\": \"${{ github.ref_name }}\",
+              \"commitSha\": \"${{ github.sha }}\",
+              \"results\": $RESULTS
+            }"
